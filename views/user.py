@@ -67,6 +67,24 @@ class SingleUserManagement(Resource):
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
 
+    def get(self,user_id):
+        try:
+
+            query = text("""select id,name,email from users
+            where id=:id """)
+            user_det = db.engine.execute(query, id=user_id).fetchone()
+            if user_det:
+                data = dict(user_det)
+                return make_response(jsonify({'msg':'Success','data':data}),200)
+
+            return make_response(jsonify({'msg':'User Not Found','data':{}}),400)
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+
 class UserLogin(Resource):
 
     def post(self):
