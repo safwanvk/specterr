@@ -8,3 +8,7 @@ REQ_ENVS_WEB = {
 }
 
 ALLOW_ORIGINS = []
+
+class Role:
+    Admin=1
+    User=2

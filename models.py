@@ -25,3 +25,4 @@ class Users(db.Model, DictModel):
     is_active = db.Column(db.Boolean, default=True)
     token = db.Column(db.String(255), nullable=True)
     no_logins = db.Column(db.Integer,nullable=True, default=0)
+    role = db.Column(db.Integer)

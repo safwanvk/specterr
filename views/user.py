@@ -18,6 +18,7 @@ class UserManagement(Resource):
 
             parser.add_argument('email',type=str,required=True,help='email is required and must be str')
             parser.add_argument('password',required=True,help='password is required')
+            parser.add_argument('role')
             
             args = parser.parse_args()
             args['password'] = bcrypt.generate_password_hash(args.get('password'), 10)
@@ -55,6 +56,7 @@ class UserLogin(Resource):
 
                     payload = {
                         "id":user_data.id,
+                        "role":user_data.role
                     }
                     token = generate_token(payload)
 
@@ -78,6 +80,39 @@ class UserLogin(Resource):
         except reqparse.ParserError as e:
             print(e.args)
             return make_response(jsonify({"msg":e.args[0]}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500) 
+
+class UserLogout(Resource):
+    @auth([Role.User,Role.Admin])
+    def post(self):
+        try:
+            http_args = request.args.to_dict()
+            query = text("""UPDATE users SET token=:token,no_logins=no_logins-1 WHERE id=:id and no_logins <= 1 """)
+            dic = {
+                "token": None,
+                "id": http_args.get('user_id')
+            }
+            db.engine.execute(query, dic)
+
+            query = text("""UPDATE users SET no_logins=no_logins-1 WHERE id=:id and no_logins > 1 """)
+            dic = {
+                "token": None,
+                "id": http_args.get('user_id')
+            }
+            db.engine.execute(query, dic)
+            req_sys_type = sys_type()
+            if req_sys_type == 'WEB' or req_sys_type == 'POSTMAN':
+                resp = make_response(jsonify({'msg':'success'}),200)
+                resp.set_cookie('acces_token',"",httponly=True,max_age=0)
+                return resp
+            if req_sys_type == 'MOB':
+                return make_response(jsonify({'msg':'Success'}),200)
+
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
         except Exception as e:
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500) 
