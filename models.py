@@ -3,8 +3,10 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from utils.sqalchemy import DictModel
+from dotenv import load_dotenv
 
 
+load_dotenv()
 app = Flask(__name__,static_folder='/uploads')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@127.0.0.1/specterr'
