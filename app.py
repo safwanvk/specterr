@@ -12,6 +12,7 @@ CORS(app)
 api.add_resource(UserManagement, '/user')
 api.add_resource(UserLogin, '/user/login')
 api.add_resource(UserLogout, '/user/logout')
+api.add_resource(SingleUserManagement, '/user/<int:user_id>')
 
 
 if __name__ == "__main__":

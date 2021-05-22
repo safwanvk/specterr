@@ -40,6 +40,33 @@ class UserManagement(Resource):
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
 
+class SingleUserManagement(Resource):
+
+    def put(self,user_id):
+        try:
+            parser = reqparse.RequestParser()
+
+            parser.add_argument('email',type=str,required=True,help='email must be  string')
+            parser.add_argument('name',type=str,required=True,help='name must be  string')
+
+            parse_data = parser.parse_args()    # get parsed data from requset 
+
+            #  getting staff details
+            Users.query.filter(Users.id==user_id).update(parse_data)
+            db.session.commit()
+
+            return make_response(jsonify({'msg':'Updated User'}), 200)
+
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except reqparse.ParserError as e:
+            print(e.args)
+            return make_response(jsonify({"msg":e.args[0]}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+
 class UserLogin(Resource):
 
     def post(self):
