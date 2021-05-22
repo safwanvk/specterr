@@ -24,4 +24,4 @@ class Users(db.Model, DictModel):
     password = db.Column(db.String(255), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
     token = db.Column(db.String(255), nullable=True)
-    no_logins = db.Column(db.Integer,nullable=True)
+    no_logins = db.Column(db.Integer,nullable=True, default=0)

@@ -57,13 +57,17 @@ class UserLogin(Resource):
                         "id":user_data.id,
                     }
                     token = generate_token(payload)
+
+                    query = text("""UPDATE users SET token=:token,no_logins=no_logins+1 WHERE id=:id""")
+                    db.engine.execute(query, token=token,id=user_data.id)
+
                     req_sys_type = sys_type()
                     if req_sys_type == 'WEB' or req_sys_type == 'POSTMAN':
-                        resp = make_response(jsonify({'msg':'Success','data':{'staff_id':user_data.id}}),200)
+                        resp = make_response(jsonify({'msg':'Success','data':{'user_id':user_data.id}}),200)
                         resp.set_cookie('acces_token',token,httponly=True,max_age=60*60*24*365*2)
                         return resp
                     if req_sys_type == 'MOB':
-                        return make_response(jsonify({'msg':'Success','token':token,'staff_id':user_data.id}),200)
+                        return make_response(jsonify({'msg':'Success','token':token,'user_id':user_data.id}),200)
                     return make_response(jsonify({'msg':'Unknown Origin'}),403)
                 return make_response(jsonify({'msg': 'Invalid Username or Password'}), 400)
             return make_response(jsonify({'msg': 'Invalid Username or Password'}), 400)
