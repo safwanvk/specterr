@@ -1,14 +1,15 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
-from views.user import *
+from views.user import UserManagement
+from models import *
 
-app = Flask(__name__,static_folder='/uploads')
 api = Api(app)
 CORS(app)
 
 
-api.add_resource(Hello, '/hello')
+# api.add_resource(Hello, '/hello')
+api.add_resource(UserManagement, '/user')
 
 
 if __name__ == "__main__":

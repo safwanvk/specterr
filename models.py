@@ -3,7 +3,9 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from utils.sqalchemy import DictModel
-from app import *
+
+
+app = Flask(__name__,static_folder='/uploads')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@127.0.0.1/specterr'
 
@@ -15,7 +17,7 @@ bcrypt = Bcrypt(app)
 
 class Users(db.Model, DictModel):
     id = db.Column(db.Integer,primary_key=True,autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=True)
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
