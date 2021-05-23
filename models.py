@@ -26,3 +26,9 @@ class Users(db.Model, DictModel):
     token = db.Column(db.String(255), nullable=True)
     no_logins = db.Column(db.Integer,nullable=True, default=0)
     role = db.Column(db.Integer)
+
+
+class Videos(db.Model, DictModel):
+    id = db.Column(db.Integer,primary_key=True,autoincrement=True)
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id',ondelete='CASCADE'),nullable=False)
+    url = db.Column(db.String(255))
