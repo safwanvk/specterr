@@ -160,4 +160,5 @@ class UserLogout(Resource):
             return make_response(jsonify({'msg': 'Invalid Data'}), 400)
         except Exception as e:
             print(e)
-            return make_response(jsonify({'msg': 'Server Error'}), 500) 
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+

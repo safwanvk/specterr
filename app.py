@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
 from views.user import *
+from views.equalizer import *
 from models import *
 
 api = Api(app)
@@ -13,6 +14,7 @@ api.add_resource(UserManagement, '/user')
 api.add_resource(UserLogin, '/user/login')
 api.add_resource(UserLogout, '/user/logout')
 api.add_resource(SingleUserManagement, '/user/<int:user_id>')
+api.add_resource(Video, '/video')
 
 
 if __name__ == "__main__":

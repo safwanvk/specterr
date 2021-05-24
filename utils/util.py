@@ -4,6 +4,7 @@ from flask import make_response,jsonify, request
 from .const import *
 from functools import wraps
 from werkzeug.datastructures import ImmutableMultiDict
+from models import *
 
 # to generate new token for customers
 def generate_token(payload):
@@ -59,3 +60,22 @@ def auth(role):
                 return auth_error()
         return inner
     return decor
+
+def allowed_image_filesize(filesize):
+    if int(filesize) <= MAX_IMAGE_FILESIZE:
+        return True
+    else:
+        return False
+
+
+def allowed_video(filename):
+
+    if not "." in filename:
+        return False
+
+    ext = filename.rsplit(".", 1)[1]
+
+    if ext.upper() in ALLOWED_EXTENSIONS:
+        return True
+    else:
+        return False
