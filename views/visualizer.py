@@ -5,6 +5,7 @@ import cv2 as cv
 import librosa
 import ffmpeg
 from models import *
+import threading
 
 screen_width = 1920
 screen_height = 1080
@@ -12,6 +13,9 @@ FPS = 60
 seconds = 10
 no_of_bars = 100
 left_space = 10
+
+t = threading.Thread()
+complete = False
 
 class bar:
     def __init__(self, x, y, color, max_height=100, min_height=5, width=10, height_decibel_ratio=0.5):
@@ -33,6 +37,7 @@ class bar:
 
 def main(filename):
     # Make sense of audio
+    # filename='savedfile_simple1.wav'
     VidName = f'{filename}_TEMP.avi'
 
     ts, sr = librosa.load(UPLOAD_FOLDER + filename)
@@ -107,6 +112,8 @@ def main(filename):
         print(e.stderr)
     if os.path.exists(VidName):
         os.remove(VidName)
+    global complete
+    complete = True
 
 
 
@@ -119,3 +126,4 @@ def clamp(min_value, max_value, value):
         return max_value
 
     return value
+

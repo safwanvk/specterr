@@ -34,7 +34,10 @@ class Video(Resource):
                 t = threading.Thread(target=main,args=(filename,))
                 t.daemon = True
                 t.start()
-                
+
+            global complete
+            print(complete)
+            if complete:
                 http_args = request.args.to_dict()
                 video_dict = Videos(url=f'{filename}.mp4',user_id=http_args.get('user_id'))
                 db.session.add(video_dict)

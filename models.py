@@ -5,7 +5,7 @@ import datetime
 from utils.sqalchemy import DictModel
 from dotenv import load_dotenv
 
-UPLOAD_FOLDER = '/home/safwan/Documents/projects/python/specterr/uploads/'
+UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = ["MP3", "WAV", "AAC", "FLAC"]
 MAX_IMAGE_FILESIZE = 5 * 1024 * 1024  # 5mb
 
