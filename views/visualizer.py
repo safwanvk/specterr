@@ -107,7 +107,7 @@ def main(filename):
     input_audio = ffmpeg.input(UPLOAD_FOLDER + filename)
     try:
         ffmpeg.concat(input_video, input_audio, v=1, a=1).output(
-            UPLOAD_FOLDER + filename+'.mp4').run()
+            UPLOAD_FOLDER + filename +'.mp4').run()
     except ffmpeg.Error as e:
         print(e.stderr)
     if os.path.exists(VidName):

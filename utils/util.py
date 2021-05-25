@@ -68,14 +68,18 @@ def allowed_image_filesize(filesize):
         return False
 
 
+# def allowed_video(filename):
+
+#     if not "." in filename:
+#         return False
+
+#     ext = filename.rsplit(".", 1)[1]
+
+#     if ext.upper() in ALLOWED_EXTENSIONS:
+#         return True
+#     else:
+#         return False
+
 def allowed_video(filename):
-
-    if not "." in filename:
-        return False
-
-    ext = filename.rsplit(".", 1)[1]
-
-    if ext.upper() in ALLOWED_EXTENSIONS:
-        return True
-    else:
-        return False
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS 

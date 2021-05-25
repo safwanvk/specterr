@@ -23,13 +23,15 @@ class Video(Resource):
             file_length = file.tell()
             if not allowed_image_filesize(file_length):
                 return make_response(jsonify({'msg':'Please put file less than 5MB'}),400)
-
+            file.seek(0)
             if not allowed_video(file.filename):
                 return make_response(jsonify({'msg':'This Video extension is not Allowed'}),400)
 
             if file and allowed_video(file.filename):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                # filename = file.filename
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+                
 
                 t = threading.Thread(target=main,args=(filename,))
                 t.daemon = True
