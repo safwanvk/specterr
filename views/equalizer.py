@@ -9,9 +9,9 @@ import threading
 from views.visualizer import *
 
 class Video(Resource):
-
+    @auth([Role.User,Role.Admin])
     def post(self):
-       
+        
         try:
             if 'file' not in request.files:
                 return make_response(jsonify({'msg':'No file part'}),400)
@@ -32,23 +32,17 @@ class Video(Resource):
                 # filename = file.filename
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
                 
-
-                t = threading.Thread(target=main,args=(filename,))
-                t.daemon = True
-                t.start()
-
-            global complete
-            print(complete)
-            if complete:
+                main(filename)
                 http_args = request.args.to_dict()
-                video_dict = Videos(url=f'{filename}.mp4',user_id=http_args.get('user_id'))
+                # todo change in host
+                video_dict = Videos(url=f'http://192.168.43.88:5000/uploads/{filename}.mp4',user_id=http_args.get('user_id'))
                 db.session.add(video_dict)
                 db.session.commit()
                 os.remove(UPLOAD_FOLDER+filename)
-                return make_response(jsonify({'msg':'Success','url':f'{filename}.mp4'}), 200)
+                return make_response(jsonify({'msg':'Success','url':f'http://192.168.43.88:5000/uploads/{filename}.mp4'}), 200)
 
         except SQLAlchemyError as e:
-            print(e.__dict__['orig'].args[0])
+            print(e)
             if e.__dict__['orig'].args[0] == 1062:
                 return make_response(jsonify({'msg': e.__dict__['orig'].args[1]}), 400)
             return make_response(jsonify({'msg': 'Invalid Data'}), 400)

@@ -98,15 +98,14 @@ class UserLogin(Resource):
             user_data = Users.query.filter(Users.email==data.get('email')).first()
             if user_data:
                 if bcrypt.check_password_hash(user_data.password,data.get('password')):
-
                     payload = {
                         "id":user_data.id,
                         "role":user_data.role
                     }
                     token = generate_token(payload)
-
                     query = text("""UPDATE users SET token=:token,no_logins=no_logins+1 WHERE id=:id""")
                     db.engine.execute(query, token=token,id=user_data.id)
+
 
                     req_sys_type = sys_type()
                     if req_sys_type == 'WEB' or req_sys_type == 'POSTMAN':
