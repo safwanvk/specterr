@@ -11,7 +11,8 @@ MAX_IMAGE_FILESIZE = 5 * 1024 * 1024  # 5mb
 
 
 load_dotenv()
-app = Flask(__name__,static_folder='/uploads')
+app = Flask(__name__,static_url_path="/uploads",
+            static_folder="./uploads")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:1234@127.0.0.1/specterr'
 
