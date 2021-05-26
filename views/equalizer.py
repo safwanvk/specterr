@@ -4,6 +4,7 @@ from flask_restful import Resource,reqparse
 from sqlalchemy.exc import SQLAlchemyError
 from models import *
 from utils.util import *
+from utils.sqalchemy import *
 from werkzeug.utils import secure_filename
 import threading
 from views.visualizer import *
@@ -45,6 +46,26 @@ class Video(Resource):
             print(e)
             if e.__dict__['orig'].args[0] == 1062:
                 return make_response(jsonify({'msg': e.__dict__['orig'].args[1]}), 400)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+    @auth([Role.User,Role.Admin])
+    def get(self):
+        try:
+            http_args = request.args.to_dict()
+            user_id=http_args.get('user_id')
+
+            query = text("""select id,url from videos
+            where user_id=:user_id """)
+            video_det = db.engine.execute(query, user_id=user_id).fetchall()
+            if video_det:
+                data = aslist(video_det)
+                return make_response(jsonify({'msg':'Success','data':data}),200)
+
+            return make_response(jsonify({'msg':'Video Not Found','data':{}}),400)
+        except SQLAlchemyError as e:
+            print(e)
             return make_response(jsonify({'msg': 'Invalid Data'}), 400)
         except Exception as e:
             print(e)
