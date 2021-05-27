@@ -195,6 +195,30 @@ class ForgotPassword(Resource):
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
 
+    def put(self):
+        # change password
+        try:
+            parser = reqparse.RequestParser()
+            
+            parser.add_argument('otp',type=int, required=True,help='otp is required')
+            parser.add_argument('email',type=str, required=True,help='email is required')
+            parser.add_argument('password',type=str, required=True,help='password is required')
+            args = parser.parse_args()
+
+            otp = cache_code(args.get('email'))
+
+            if otp == args.get('otp'):
+                password = bcrypt.generate_password_hash(args.get('password'), 10)
+
+                query = text("""update users set password=:password where email=:email """)
+                db.engine.execute(query, password=password, email=args.get('email'))
+                return make_response(jsonify({'msg': 'Password Updated'}), 200)
+            else:
+                return make_response(jsonify({'msg': 'invalid otp'}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+
 class VerifyOTP(Resource):
     # verify otp
     def post(self):
@@ -211,6 +235,9 @@ class VerifyOTP(Resource):
                 return make_response(jsonify({'msg': 'Otp Verified'}), 200)
             else:
                 return make_response(jsonify({'msg': 'Invalid Otp'}), 400)
+        except reqparse.ParserError as e:
+            print(e.args)
+            return make_response(jsonify({"msg":e.args[0]}), 400)
         except Exception as e:
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
