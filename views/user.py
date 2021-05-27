@@ -215,12 +215,17 @@ class ForgotPassword(Resource):
                 return make_response(jsonify({'msg': 'Password Updated'}), 200)
             else:
                 return make_response(jsonify({'msg': 'invalid otp'}), 400)
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except reqparse.ParserError as e:
+            print(e.args)
+            return make_response(jsonify({"msg":e.args[0]}), 400)
         except Exception as e:
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
 
 class VerifyOTP(Resource):
-    # verify otp
     def post(self):
         try:
             parser = reqparse.RequestParser()
@@ -235,6 +240,44 @@ class VerifyOTP(Resource):
                 return make_response(jsonify({'msg': 'Otp Verified'}), 200)
             else:
                 return make_response(jsonify({'msg': 'Invalid Otp'}), 400)
+        except reqparse.ParserError as e:
+            print(e.args)
+            return make_response(jsonify({"msg":e.args[0]}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+
+class ChangePassword(Resource):
+    @auth([Role.User,Role.Admin])
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            
+            parser.add_argument('old_password',type=str, required=True,help='old_password is required')
+            parser.add_argument('new_password',type=str, required=True,help='new_password is required')
+            args = parser.parse_args()
+            
+            http_args = request.args.to_dict()
+            query = text("""SELECT password from users where id=:id """)
+            res = db.engine.execute(query, id=http_args.get('user_id')).fetchone()
+            if res:
+                res = dict(res)
+
+                if bcrypt.check_password_hash(res.get('password'),args.get('old_password')):
+
+                    password = bcrypt.generate_password_hash(args.get('new_password'), 10)
+                    query = text("""update users set password=:password where id=:id """)
+                    db.engine.execute(query, password=password, id=http_args.get('user_id'))
+
+                    return make_response(jsonify({'msg': 'Password Changed'}), 200)
+
+                else:
+                    return make_response(jsonify({'msg': 'Invalid Password'}), 400)
+            else:
+                return make_response(jsonify({'msg': 'Invalid User'}), 400)
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
         except reqparse.ParserError as e:
             print(e.args)
             return make_response(jsonify({"msg":e.args[0]}), 400)
