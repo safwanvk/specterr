@@ -195,3 +195,23 @@ class ForgotPassword(Resource):
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
 
+class VerifyOTP(Resource):
+    # verify otp
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            
+            parser.add_argument('otp',type=int, required=True,help='otp is required')
+            parser.add_argument('email',type=str, required=True,help='email is required')
+            args = parser.parse_args()
+
+            otp = cache_code(args.get('email'))
+
+            if otp == args.get('otp'):
+                return make_response(jsonify({'msg': 'Otp Verified'}), 200)
+            else:
+                return make_response(jsonify({'msg': 'Invalid Otp'}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+
