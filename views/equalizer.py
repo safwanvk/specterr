@@ -1,5 +1,5 @@
 from sqlalchemy import text
-from flask import jsonify, request,make_response
+from flask import jsonify, request,make_response,send_file
 from flask_restful import Resource,reqparse
 from sqlalchemy.exc import SQLAlchemyError
 from models import *
@@ -64,6 +64,27 @@ class Video(Resource):
                 return make_response(jsonify({'msg':'Success','data':data}),200)
 
             return make_response(jsonify({'msg':'Video Not Found','data':{}}),400)
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+
+class Download(Resource):
+    @auth([Role.User,Role.Admin])
+    def get(self, id):
+        try:
+
+            query = text("""select url from videos
+            where id=:id """)
+            video_det = db.engine.execute(query, id=id).fetchone()
+            if video_det:
+                data = dict(video_det)
+                path = data.get('url').split('http://192.168.43.88:5000/')
+                return send_file(path[1], as_attachment=True)
+
+            return make_response(jsonify({'msg':'Video Not Found'}),400)
         except SQLAlchemyError as e:
             print(e)
             return make_response(jsonify({'msg': 'Invalid Data'}), 400)
