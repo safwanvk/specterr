@@ -12,3 +12,6 @@ ALLOW_ORIGINS = []
 class Role:
     Admin=1
     User=2
+
+EMAIL_ID = "smashx2018@gmail.com"
+EMAIL_PASS = "tedaaststewbwlhk"

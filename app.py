@@ -16,6 +16,7 @@ api.add_resource(UserLogout, '/user/logout')
 api.add_resource(SingleUserManagement, '/user/<int:user_id>')
 api.add_resource(Video, '/video')
 api.add_resource(Download, '/download/<int:id>')
+api.add_resource(ForgotPassword, '/forgot_password')
 
 
 if __name__ == "__main__":

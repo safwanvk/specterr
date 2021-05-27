@@ -5,6 +5,9 @@ from .const import *
 from functools import wraps
 from werkzeug.datastructures import ImmutableMultiDict
 from models import *
+from cachetools import cached, LRUCache, TTLCache
+from random import randint
+import smtplib
 
 # to generate new token for customers
 def generate_token(payload):
@@ -83,3 +86,38 @@ def allowed_image_filesize(filesize):
 def allowed_video(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS 
+
+
+code_cache=TTLCache(maxsize=1024, ttl=1800)
+
+@cached(cache=code_cache)
+def cache_code(email_id):
+    range_start = 10**(4-1)
+    range_end = (10**4)-1
+    return randint(range_start, range_end)
+
+
+def send_otp(name, _email_list, otp):
+    host = 'smtp.gmail.com'
+    port = 587
+    email = EMAIL_ID
+    password = EMAIL_PASS
+    subject = "Verification"
+    mail_to = _email_list
+    mail_from = email
+    body = f"Hi {name}, \n\n Your Verification Code is : {otp}\n\n "
+    # return u_id
+    message = """From: %s\nTo:
+    %s\nSubject:
+    %s\n\n%s""" % (mail_from, mail_to, subject, body)
+    try:
+        server = smtplib.SMTP(host, port)
+        server.ehlo()
+        server.starttls()
+        server.login(email, password)
+        server.sendmail(mail_from, mail_to, message)
+        server.close()
+        return 1
+    except Exception as e:
+        print(e)
+        return make_response(jsonify({'msg': 'Bad request'}))

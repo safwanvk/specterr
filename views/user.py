@@ -161,3 +161,37 @@ class UserLogout(Resource):
             print(e)
             return make_response(jsonify({'msg': 'Server Error'}), 500)
 
+class ForgotPassword(Resource):
+    # OTP send to mail
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+
+            parser.add_argument('email',type=str, required=True,help='email is required')
+            args = parser.parse_args()
+
+            query = text("""SELECT name,email from users where email=:email """)
+            res = db.engine.execute(query, email=args.get('email')).fetchone()
+            if res:
+                res = dict(res)
+                
+                # store in cache
+                otp = cache_code(res.get('email'))
+                
+                email_status = send_otp(res.get('name'), res.get('email'), otp)
+                if email_status:
+                    return make_response(jsonify({'msg': 'Success'}), 200)
+                    
+                return make_response(jsonify({'msg': 'Mail Server Error'}), 500)
+            else:
+                return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except SQLAlchemyError as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Invalid Data'}), 400)
+        except reqparse.ParserError as e:
+            print(e.args)
+            return make_response(jsonify({"msg":e.args[0]}), 400)
+        except Exception as e:
+            print(e)
+            return make_response(jsonify({'msg': 'Server Error'}), 500)
+

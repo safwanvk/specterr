@@ -40,7 +40,7 @@ class Video(Resource):
                 db.session.add(video_dict)
                 db.session.commit()
                 os.remove(UPLOAD_FOLDER+filename)
-                return make_response(jsonify({'msg':'Success','url':f'http://192.168.43.88:5000/uploads/{filename}.mp4'}), 200)
+                return make_response(jsonify({'msg':'Success','url':f'http://192.168.43.88:5000/uploads/{filename}.mp4','id':video_dict.id}), 200)
 
         except SQLAlchemyError as e:
             print(e)
